@@ -29,6 +29,16 @@ Wechat.isInstalled(function (installed) {
 });
 ```
 
+## Reset appId 
+```Javascript
+Wechat.setAppId("wx2befb95ds271c23s", function (ok) {
+    alert("Set appid " + ok);
+}, function (reason) {
+    alert("Failed: " + reason);
+});
+```
+
+
 ## Authenticate using Wechat
 ```Javascript
 var scope = "snsapi_userinfo",
