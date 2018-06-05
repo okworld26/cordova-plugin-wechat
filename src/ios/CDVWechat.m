@@ -31,6 +31,24 @@ static int const MAX_THUMBNAIL_SIZE = 320;
     [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
 }
 
+- (void)setAppId:(CDVInvokedUrlCommand *)command
+{
+    CDVPluginResult* pluginResult = nil;
+    NSString* appId = [command.arguments objectAtIndex:0];
+    
+    if (appId) {
+        self.wechatAppId = appId;
+        [WXApi registerApp: appId];
+        
+        NSLog(@"cordova-plugin-wechat has been reset appid. Wechat SDK Version: %@. APP_ID: %@.", [WXApi getApiVersion], appId);
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK ];
+    }else{
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+    }
+    
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
 - (void)share:(CDVInvokedUrlCommand *)command
 {
     // if not installed
