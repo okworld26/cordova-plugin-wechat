@@ -102,6 +102,8 @@ public class Wechat extends CordovaPlugin {
 
         super.pluginInitialize();
 
+        appId = getSavedAppId(cordova.getActivity());
+
         String id = getAppId();
 
         // save app id
@@ -142,7 +144,9 @@ public class Wechat extends CordovaPlugin {
     public boolean execute(String action, CordovaArgs args, CallbackContext callbackContext) throws JSONException {
         Log.d(TAG, String.format("%s is called. Callback ID: %s.", action, callbackContext.getCallbackId()));
 
-        if (action.equals("share")) {
+        if (action.equals("setAppId")) {
+            return setAppId(args, callbackContext);
+        } else if (action.equals("share")) {
             return share(args, callbackContext);
         } else if (action.equals("sendAuthRequest")) {
             return sendAuthRequest(args, callbackContext);
@@ -155,6 +159,44 @@ public class Wechat extends CordovaPlugin {
         }
 
         return false;
+    }
+
+    private boolean setAppId(CordovaArgs args, CallbackContext callbackContext) {
+        PluginResult result;
+        String appid;
+        try {
+            appid = args.getString(0);
+        } catch (JSONException e) {
+            callbackContext.error(ERROR_INVALID_PARAMETERS);
+            return true;
+        }
+        if (appid != null && appid.length() > 0) {
+
+
+            Log.d(TAG, "setAppId is old " + getSavedAppId(cordova.getActivity()));
+            Log.d(TAG, "setAppId is new " + appid);
+
+            saveAppId(cordova.getActivity(), appid);
+            IWXAPI api = getWxAPI(cordova.getActivity());
+
+            if (api != null) {
+                api.unregisterApp();
+                api.registerApp(appid);
+            }
+
+
+
+            result = new PluginResult(PluginResult.Status.OK);
+        } else {
+            result = new PluginResult(PluginResult.Status.ERROR);
+        }
+
+        result.setKeepCallback(false);
+        if (callbackContext != null) {
+            callbackContext.sendPluginResult(result);
+            callbackContext = null;
+        }
+        return true;
     }
 
     protected boolean share(CordovaArgs args, final CallbackContext callbackContext)
@@ -596,10 +638,11 @@ public class Wechat extends CordovaPlugin {
     }
 
     public String getAppId() {
-        if (appId == null) {
+        if (appId == null || appId == "") {
             appId = preferences.getString(WXAPPID_PROPERTY_KEY, "");
         }
 
+        Log.d(TAG, "getAppId is " + appId);
         return appId;
     }
 

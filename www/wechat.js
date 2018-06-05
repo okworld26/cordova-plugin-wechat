@@ -49,6 +49,10 @@ module.exports = {
         exec(onSuccess, onError, "Wechat", "share", [message]);
     },
 
+    setAppId: function (message, onSuccess, onError) {
+        exec(onSuccess, onError, "Wechat", "setAppId", [message]);
+    },
+
     /**
      * Sending an auth request to Wechat
      *
